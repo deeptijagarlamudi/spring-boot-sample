@@ -1,6 +1,5 @@
 package com.spring.boot.demo;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,18 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.spring.boot.demo.domain.Employee;
 import com.spring.boot.demo.repository.EmployeeRepository;
 
 @Controller
 public class EmployeeServiceController {
-	
+
 	@Autowired
 	private EmployeeRepository employeeRepository;
 
-	@GetMapping(value ="/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Employee>> retrieveAllEmployees() {
 		return ResponseEntity.ok(employeeRepository.findAll());
 	}
@@ -44,25 +42,20 @@ public class EmployeeServiceController {
 	@PostMapping("/employees")
 	public ResponseEntity<Employee> createEmployee(@RequestBody Employee Employee) {
 		Employee savedEmployee = employeeRepository.save(Employee);
-
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(savedEmployee.getEmployeeId()).toUri();
 		return ResponseEntity.ok(savedEmployee);
 
 	}
-	
+
 	@PutMapping("/employees/{id}")
-	public ResponseEntity<Object> updateEmployee(@RequestBody Employee Employee, @PathVariable long id) {
+	public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee, @PathVariable long id) {
 
-		Optional<Employee> EmployeeOptional = employeeRepository.findById(id);
+		Optional<Employee> employeeOptional = employeeRepository.findById(id);
 
-		if (!EmployeeOptional.isPresent())
+		if (!employeeOptional.isPresent())
 			return ResponseEntity.notFound().build();
 
-		Employee.setEmployeeId(id);
-		
-		employeeRepository.save(Employee);
-
-		return ResponseEntity.noContent().build();
+		employee.setEmployeeId(id);
+		Employee savedEmployee = employeeRepository.save(employee);
+		return ResponseEntity.ok(savedEmployee);
 	}
 }
